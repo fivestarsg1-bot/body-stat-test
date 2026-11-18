@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 몸 캐릭터 스탯 테스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF7EC; --card:#FFFFFF; --ink:#2A2733; --sub:#6E6878; --line:#EFE6D8;
+  --coral:#FF6B4A; --coral-soft:#FFE6DF; --mint:#22A06B; --mint-soft:#DDF5EA;
+  --sky:#3D7BE0; --sky-soft:#E3EDFD; --gold:#F2A900;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:440px;padding:20px 18px 40px;position:relative}
+.screen{display:none;animation:fade .35s ease}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.brand{font-size:12px;color:var(--sub);letter-spacing:.02em;text-align:center;margin-bottom:18px}
+.brand b{color:var(--ink)}
+.hero-emoji{font-size:72px;text-align:center;margin:18px 0 6px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+h1{font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:30px;line-height:1.3;text-align:center;font-weight:400}
+.lead{text-align:center;color:var(--sub);font-size:15px;line-height:1.6;margin:10px 0 20px}
+.pill-row{display:flex;justify-content:center;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:13px;color:var(--sub)}
+.lock{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;font-size:14px;line-height:1.65;margin-bottom:20px}
+.lock .t{font-weight:700;margin-bottom:6px}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:17px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-main{background:var(--coral);color:#fff;box-shadow:0 6px 0 #D9502F}
+.btn-main:active{box-shadow:0 2px 0 #D9502F;transform:translateY(4px)}
+.btn-ghost{background:transparent;color:var(--sub);font-weight:500;font-size:14px;padding:12px}
+.btn-sub{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+.fine{font-size:12px;color:var(--sub);line-height:1.6;text-align:center;margin-top:14px}
+
+/* quiz */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.back{border:0;background:var(--card);width:38px;height:38px;border-radius:12px;font-size:18px;cursor:pointer;border:1px solid var(--line);flex:none}
+.bar{flex:1;height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--coral));border-radius:99px;transition:width .35s}
+.count{font-size:13px;color:var(--sub);font-weight:700;min-width:34px;text-align:right}
+.qnum{font-size:13px;font-weight:700;color:var(--coral);margin-bottom:6px}
+.qtitle{font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:25px;line-height:1.35;margin-bottom:6px}
+.qsub{color:var(--sub);font-size:14px;margin-bottom:20px;line-height:1.5}
+.opts{display:grid;gap:10px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{display:flex;align-items:center;gap:14px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:15px 16px;cursor:pointer;font-family:inherit;text-align:left;font-size:16px;color:var(--ink);transition:all .15s}
+.opt .e{font-size:30px;line-height:1;flex:none}
+.opt .d{display:block;font-size:12px;color:var(--sub);margin-top:3px}
+.opts.two .opt{flex-direction:column;justify-content:center;text-align:center;padding:22px 10px;gap:8px}
+.opts.two .opt .e{font-size:46px}
+.opt:active,.opt.sel{border-color:var(--coral);background:var(--coral-soft);transform:scale(.98)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.chip{border:2px solid var(--line);background:var(--card);border-radius:99px;padding:10px 14px;font-size:15px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.chip.sel{border-color:var(--coral);background:var(--coral-soft);font-weight:700}
+
+/* body sliders */
+.bodybox{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 18px;margin-bottom:18px}
+.avatar{font-size:64px;text-align:center;transition:transform .25s}
+.sl{margin-top:18px}
+.sl label{display:flex;justify-content:space-between;font-size:14px;color:var(--sub);margin-bottom:8px}
+.sl label b{font-size:22px;color:var(--ink)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:99px;background:var(--line);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--coral);border:4px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--coral);border:4px solid #fff}
+.stepper{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}
+.stepper button{border:1px solid var(--line);background:#fff;border-radius:8px;width:34px;height:28px;cursor:pointer;font-size:15px}
+
+/* loading */
+.loading{text-align:center;padding-top:110px}
+.loading .e{font-size:64px;display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{margin-top:18px;color:var(--sub)}
+
+/* result */
+.rcard{background:var(--card);border-radius:24px;padding:24px 20px;border:1px solid var(--line);margin-bottom:16px}
+.rhead{text-align:center}
+.rhead .tag{display:inline-block;background:var(--ink);color:#fff;font-size:12px;padding:4px 10px;border-radius:99px;margin-bottom:12px}
+.rhead .big{font-size:68px;line-height:1}
+.rhead .nick{font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:26px;margin:10px 0 6px}
+.rhead .desc{color:var(--sub);font-size:14px;line-height:1.6}
+.stats{margin-top:20px;display:grid;gap:11px}
+.st{display:grid;grid-template-columns:86px 1fr 48px;align-items:center;gap:8px;font-size:14px}
+.st .nm{font-weight:700}
+.st .tr{height:14px;background:#F3EDE3;border-radius:99px;overflow:hidden}
+.st .tr i{display:block;height:100%;border-radius:99px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.st .lv{font-weight:900;font-size:14px;text-align:right}
+.traits{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:12px}
+.traits span{background:#F6F0E6;border-radius:99px;padding:5px 10px;font-size:12.5px;font-weight:500}
+.sec-t{font-size:13px;font-weight:900;letter-spacing:.04em;margin:4px 0 4px}
+.sec-h{font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:21px;margin-bottom:14px;line-height:1.4}
+.good{background:var(--mint-soft);border-radius:14px;padding:13px 14px;font-size:15px;margin-bottom:8px;line-height:1.5}
+.item{border-top:1px dashed var(--line);padding:14px 0}
+.item:first-of-type{border-top:0;padding-top:4px}
+.item .it{font-weight:700;font-size:16px;margin-bottom:5px}
+.item .ix{font-size:14px;color:var(--ink);line-height:1.65}
+.ev{margin-top:8px;background:#F8F5F0;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.6}
+.ev b{color:var(--coral)}
+.ev .src{display:block;color:var(--sub);font-size:11.5px;margin-top:4px}
+.cov{background:var(--sky-soft);border-radius:14px;padding:13px 14px;margin-top:10px;font-size:14px;line-height:1.6}
+.cov .ct{font-weight:900;color:var(--sky);margin-bottom:4px}
+.cov ul{padding-left:18px}
+.motto{text-align:center;font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:19px;line-height:1.55;padding:20px 10px}
+.motto b{color:var(--coral)}
+.share-box{background:var(--ink);color:#fff;border-radius:22px;padding:22px 18px;margin-bottom:16px}
+.share-box .h{font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:21px;margin-bottom:6px}
+.share-box p{font-size:13.5px;line-height:1.6;opacity:.85;margin-bottom:14px}
+.share-box .btn{margin-bottom:10px}
+.share-box .btn-sub{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;transition:all .25s;pointer-events:none;z-index:50}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(20,18,26,.75);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}
+.modal.on{display:flex}
+.modal .in{background:var(--card);border-radius:20px;padding:16px;max-width:400px;width:100%;max-height:92vh;overflow:auto;text-align:center}
+.modal img{width:100%;border-radius:12px;display:block;margin-bottom:12px;-webkit-touch-callout:default}
+.modal p{font-size:14px;color:var(--sub);margin-bottom:12px;line-height:1.5}
+.disc{font-size:11.5px;color:var(--sub);line-height:1.7;padding:6px 4px 20px}
+details.evd{margin-top:8px}
+details.evd summary{list-style:none;cursor:pointer;font-size:13px;color:var(--sub);display:inline-block;padding:4px 0}
+details.evd summary::-webkit-details-marker{display:none}
+details.evd[open] summary{color:var(--coral)}
+.hl{display:inline-block;margin-top:8px;background:var(--coral-soft);color:#C2410C;font-weight:900;font-size:14px;padding:5px 10px;border-radius:10px}
+.sc{border:2px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;transition:all .2s}
+.sc .q{font-size:15px;line-height:1.55;font-weight:500;margin-bottom:10px}
+.sc .ab{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc .ab button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:11px;font-size:15px;font-family:inherit;cursor:pointer;color:var(--ink)}
+.sc .ab button.on{border-color:var(--coral);background:var(--coral-soft);font-weight:700}
+.sc.done{border-color:#E9DFD0;background:#FFFCF7}
+.scres{display:none;border-radius:18px;padding:18px;margin-top:6px;text-align:center}
+.scres.on{display:block}
+.scres .n{font-size:40px;font-weight:900;color:var(--coral);line-height:1.1}
+.scres p{font-size:14.5px;line-height:1.65;margin-top:8px}
+details.refs{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:16px;font-size:12.5px;line-height:1.7}
+details.refs summary{font-weight:700;cursor:pointer;font-size:14px}
+details.refs ol{padding-left:18px;margin-top:10px;color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- INTRO -->
+  <section class="screen on" id="s-intro">
+        <div class="hero-emoji">🎮</div>
+    <h1>내 몸 캐릭터<br>스탯 테스트</h1>
+    <p class="lead">생활습관으로 알아보는 나의 건강 스탯<br>강점과 레벨업 포인트를 찾아드려요</p>
+    <div class="pill-row">
+      <span class="pill">⏱ 1분</span><span class="pill">👆 13문항, 탭만 하면 끝</span><span class="pill">📊 국내 연구 근거</span>
+    </div>
+    <div class="lock">
+      <div class="t">🔒 입력한 내용은 저장되지 않아요</div>
+      키, 몸무게, 가족력 등 답변은 이 화면 안에서만 계산되고 어디에도 저장·전송되지 않아요. 화면을 닫으면 사라집니다.<br>
+      결과를 상담사에게 보낼지는 마지막에 <b>직접</b> 선택하세요. 보내더라도 <b>답변 내용은 빠지고 결과만</b> 담겨요.
+    </div>
+    <button class="btn btn-main" onclick="start()">테스트 시작하기</button>
+    <p class="fine">의학적 진단이 아닌 참고용 셀프체크입니다.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="s-quiz">
+    <div class="top">
+      <button class="back" onclick="prev()" aria-label="이전">←</button>
+      <div class="bar"><i id="bar"></i></div>
+      <div class="count" id="count"></div>
+    </div>
+    <div id="qwrap"></div>
+  </section>
+
+  <!-- LOADING -->
+  <section class="screen" id="s-load">
+    <div class="loading"><span class="e">⚙️</span><p id="loadtxt">스탯 계산 중...</p></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+        <div class="rcard">
+      <div class="rhead">
+        <span class="tag">나의 건강 캐릭터</span>
+        <div class="big" id="r-emoji"></div>
+        <div class="nick" id="r-nick"></div>
+        <div class="desc" id="r-desc"></div>
+        <div class="traits" id="r-traits"></div>
+      </div>
+      <div class="stats" id="r-stats"></div>
+    </div>
+
+    <div class="rcard">
+      <div class="sec-t" style="color:var(--mint)">① 잘하고 있어요</div>
+      <div class="sec-h">이미 갖춘 강점 스탯</div>
+      <div id="r-good"></div>
+    </div>
+
+    <div class="rcard">
+      <div class="sec-t" style="color:var(--coral)">② 레벨업 포인트</div>
+      <div class="sec-h">습관으로 <u>바꿀 수 있는</u> 것</div>
+      <div id="r-up"></div>
+    </div>
+
+    <div class="rcard">
+      <div class="sec-t" style="color:var(--sky)">③ 대비 포인트</div>
+      <div class="sec-h">습관으로 <u>바꿀 수 없는</u> 것</div>
+      <div id="r-prep"></div>
+    </div>
+
+    <div class="motto">바꿀 수 있는 건 <b>습관</b>으로,<br>바꿀 수 없는 건 <b>보장</b>으로.</div>
+
+    <div class="rcard" id="sc-card">
+      <div class="sec-t" style="color:var(--coral)">④ 마지막 퀘스트</div>
+      <div class="sec-h">그런데, 내 보험은 어떨까요?<br><span style="font-size:15px;color:var(--sub)">솔직하게 눌러보세요. 3초면 돼요.</span></div>
+      <div id="r-sc"></div>
+      <div class="scres" id="sc-res"></div>
+    </div>
+
+    <div class="share-box" id="share">
+      <div class="h">📮 내 보험으로 확인받기</div>
+      <p>원하실 때만 보내주세요. 결과 카드에는 캐릭터·스탯·<b>확인이 필요한 항목</b>만 담기고, 키·몸무게·가족력 같은 답변은 들어가지 않아요.</p>
+      <button class="btn btn-main" onclick="copyText()">📋 확인 요청 글 복사하기</button>
+      <button class="btn btn-sub" onclick="makeImage()">🖼️ 결과 카드 이미지 만들기</button>
+      <p style="margin:6px 0 0;font-size:12px">복사한 글을 카톡에 붙여넣어 보내주세요. 이미지는 길게 눌러 저장할 수 있어요.</p>
+    </div>
+
+    <details class="refs">
+      <summary>📚 결과에 사용된 근거 자료 전체 보기</summary>
+      <ol id="r-refs"></ol>
+    </details>
+
+    <p class="disc">
+      ※ 이 테스트는 생활습관을 바탕으로 한 참고용 셀프체크이며, 의학적 진단이나 개인의 발병 확률을 뜻하지 않습니다. 제시된 수치는 해당 연구에 참여한 집단을 분석한 결과(상대위험도 등)입니다. 스탯 점수는 이해를 돕기 위한 단순 환산값입니다.<br>
+      ※ 건강 관련 판단은 의료 전문가와 상의하세요. 보험 가입 시에는 청약서의 고지사항을 사실대로 알려야 하며, 이 테스트 결과는 고지를 대신하지 않습니다.<br>
+      ※ 보장 내용과 범위는 상품과 약관에 따라 다릅니다.
+    </p>
+    <button class="btn btn-ghost" onclick="restart()">↺ 처음부터 다시 하기</button>
+  </section>
+
+  <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="in">
+      <img id="cardimg" alt="결과 카드">
+      <p>👆 이미지를 <b>길게 눌러 저장</b>하거나 공유해 주세요</p>
+      <button class="btn btn-sub" onclick="closeModal()">닫기</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ---------- 근거 자료 (원문 대조 완료) ---------- */
+const REF = {
+  smoke:  '국민건강보험공단 건강보험연구원·연세대 보건대학원 공동연구 보도자료 (2025.5.18 / 2025.8.11), 한국인 암예방연구(KCPS-II) 13만 6,965명 2020년까지 추적',
+  drink:  'Choi YJ 외. PLoS One 2017;12(10):e0185778 (정정 2018). 국가건강검진 수검자 2,332만 명, 중앙값 5.4년 추적',
+  ex:     'Han J, Ju YJ, Lee SY. Epidemiology and Health 2023;45:e2023028. 한국의료패널 성인 6,425명 10년 추적',
+  sleep:  'Yeo Y 외. J Prev Med Public Health 2013;46(5):271-281. 한국인 다기관 암코호트 13,164명',
+  salt:   'Kim J, Park S, Nam BH. Am J Clin Nutr 2010;91(5):1289-1293. 국가건강검진 수검자 약 224만 명 추적',
+  bmi:    '국민건강보험공단 건강보험연구원, 2024 한국보건교육건강증진학회 추계학술대회 발표. 성인 최대 847만 명 21년 추적',
+  famGC:  'Kim N 외. J Clin Gastroenterol 2010 (분당서울대병원, 위암 환자 428명·대조군 368명 비교)',
+  kdca:   '질병관리청 국가건강정보포털, 심뇌혈관질환 고위험군 관리',
+  ncr:    '보건복지부·중앙암등록본부, 2023년 국가암등록통계 (2026.1.20 발표)'
+};
+
+/* ---------- 문항 ---------- */
+const Q = [
+  {id:'sex', title:'플레이할 캐릭터를 골라주세요', type:'two', opts:[
+    {v:'m',e:'🙋‍♂️',t:'남성'},{v:'f',e:'🙋‍♀️',t:'여성'}]},
+  {id:'age', title:'캐릭터의 나이는?', opts:[
+    {v:20,e:'🌱',t:'20대'},{v:30,e:'🌿',t:'30대'},{v:40,e:'🌳',t:'40대'},{v:50,e:'🍂',t:'50대'},{v:60,e:'🍁',t:'60대 이상'}]},
+  {id:'body', type:'body', title:'캐릭터 체형을 맞춰주세요', sub:'숫자는 저장되지 않고 체력 스탯 계산에만 쓰여요'},
+  {id:'alarm', title:'아침 알람이 울렸다! 나는?', opts:[
+    {v:0,e:'🐓',t:'알람 전에 이미 깨 있어요',tr:'🐓 얼리버드'},
+    {v:1,e:'⏰',t:'울리자마자 벌떡',tr:'⏰ 칼기상러'},
+    {v:2,e:'😪',t:'"5분만…"을 몇 번 외쳐요',tr:'😪 5분만 장인'},
+    {v:3,e:'🛌',t:'끄고 다시 잠들어요',tr:'🛌 강심장 꿀잠러'}]},
+  {id:'sleep', title:'어젯밤, 실제로 몇 시간 잤나요?', sub:'평소와 비슷했다면 그대로 골라주세요', opts:[
+    {v:0,e:'🥱',t:'5시간 이하'},{v:1,e:'😪',t:'6시간쯤'},{v:2,e:'😴',t:'7~8시간'},{v:3,e:'🐻',t:'9시간 이상'}]},
+  {id:'lunch', title:'점심시간! 내 손이 가는 메뉴는?', opts:[
+    {v:0,e:'🍲',t:'국밥·찌개로 든든하게',tr:'🍲 국밥 러버'},
+    {v:1,e:'🍱',t:'아무거나 다 좋아요',tr:'🍱 메뉴 프리패스'},
+    {v:2,e:'🥗',t:'가볍게 샐러드·포케',tr:'🥗 가벼운 한 끼파'},
+    {v:3,e:'⚡',t:'빨리 먹는 게 최고',tr:'⚡ 스피드 식사러'}]},
+  {id:'salt', title:'음식이 싱겁다! 나의 반응은?', opts:[
+    {v:2,e:'🧂',t:'바로 간을 더해요',d:'짭짤한 게 좋아요'},
+    {v:1,e:'🍚',t:'그냥 먹어요',d:'보통이에요'},
+    {v:0,e:'😋',t:'오히려 좋아요',d:'싱겁게 먹는 편이에요'}]},
+  {id:'stairs', title:'3층에 가야 한다. 엘리베이터 앞에 줄이 있다면?', opts:[
+    {v:0,e:'🛗',t:'그래도 엘리베이터',tr:'🛗 엘리베이터 VIP'},
+    {v:1,e:'🤔',t:'줄 길면 계단',tr:'🤔 상황 판단형'},
+    {v:2,e:'🦵',t:'원래 계단으로 가요',tr:'🦵 계단 마니아'}]},
+  {id:'ex', title:'숨이 찰 만큼 움직인 날, 일주일에 며칠?', sub:'빠르게 걷기, 등산, 배드민턴 등 30분 이상', opts:[
+    {v:0,e:'🛋️',t:'거의 없어요'},{v:1,e:'🚶',t:'하루'},{v:2,e:'🏃',t:'이틀 이상'}]},
+  {id:'drink', title:'내 술잔 게이지는?', sub:'일주일을 평균 내서 골라주세요', opts:[
+    {v:0,e:'🥤',t:'거의 안 마셔요'},
+    {v:1,e:'🍺',t:'마시긴 하는데 적당히'},
+    {v:2,e:'🍻',t:'자주, 많이 마셔요',d:'평균 내면 하루 소주 5잔 꼴 이상'}]},
+  {id:'smoke', title:'담배와 나의 관계는?', opts:[
+    {v:0,e:'🚭',t:'남남이에요'},{v:1,e:'👋',t:'헤어졌어요 (끊었어요)'},{v:2,e:'🚬',t:'아직 만나는 중이에요'},{v:3,e:'⏳',t:'30년 넘게 함께했어요'}]},
+  {id:'stress', title:'스트레스 폭발 직전! 나는?', opts:[
+    {v:0,e:'🍗',t:'맛있는 걸 먹어요',tr:'🍗 먹방 해소형'},
+    {v:1,e:'😴',t:'일단 자요',tr:'😴 수면 리셋형'},
+    {v:2,e:'🏃',t:'몸을 움직여요',tr:'🏃 땀으로 푸는 형'},
+    {v:3,e:'🎮',t:'게임·영상으로 잊어요',tr:'🎮 딴세상 도피형'},
+    {v:4,e:'🤐',t:'그냥 참아요',tr:'🤐 묵묵 인내형'}]},
+  {id:'fam', type:'multi', title:'마지막! 부모님·형제자매 중 진단받은 분이 있나요?', sub:'해당하는 걸 모두 골라주세요', opts:[
+    {v:'gc',t:'🎗️ 위암'},{v:'crc',t:'🎗️ 대장암'},{v:'lung',t:'🎗️ 폐암'},{v:'liver',t:'🎗️ 간암'},{v:'panc',t:'🎗️ 췌장암'},{v:'thy',t:'🎗️ 갑상선암'},{v:'breast',t:'🎗️ 유방암',f:true},{v:'pros',t:'🎗️ 전립선암',m:true},
+    {v:'stroke',t:'🧠 뇌졸중'},{v:'heart',t:'❤️ 심장질환'},{v:'htn',t:'🩸 고혈압·당뇨'},
+    {v:'none',t:'🙅 없어요',x:true},{v:'dk',t:'🤷 잘 모르겠어요',x:true}]}
+];
+
+let A = {}, idx = 0;
+const $ = s => document.querySelector(s);
+function show(id){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));$('#'+id).classList.add('on');window.scrollTo(0,0)}
+function start(){A={fam:[]};idx=0;show('s-quiz');renderQ()}
+function restart(){show('s-intro')}
+function prev(){ if(idx===0){show('s-intro');return} idx--; renderQ() }
+function next(){ idx++; if(idx>=Q.length){finish()} else { renderQ(); if(idx===6) toast('🛠️ 절반 왔어요! 캐릭터가 만들어지는 중'); if(idx===11) toast('🔥 거의 다 왔어요!') } }
+
+function renderQ(){
+  const q = Q[idx];
+  $('#bar').style.width = ((idx)/Q.length*100)+'%';
+  $('#count').textContent = (idx+1)+'/'+Q.length;
+  let h = `<div class="qnum">Q${idx+1}</div><div class="qtitle">${q.title}</div>`;
+  h += q.sub ? `<div class="qsub">${q.sub}</div>` : `<div style="height:18px"></div>`;
+  if(q.type==='body'){
+    const m = A.sex!=='f';
+    if(A.h==null){A.h = m?172:160; A.w = m?70:56}
+    h += `<div class="bodybox"><div class="avatar" id="av">${m?'🧍‍♂️':'🧍‍♀️'}</div>
+      <div class="sl"><label>키 <b id="hv">${A.h}cm</b></label>
+        <input type="range" min="140" max="200" step="1" value="${A.h}" oninput="A.h=+this.value;upBody()">
+        <div class="stepper"><button onclick="nud('h',-1)">−</button><button onclick="nud('h',1)">+</button></div></div>
+      <div class="sl"><label>몸무게 <b id="wv">${A.w}kg</b></label>
+        <input type="range" min="35" max="140" step="1" value="${A.w}" oninput="A.w=+this.value;upBody()">
+        <div class="stepper"><button onclick="nud('w',-1)">−</button><button onclick="nud('w',1)">+</button></div></div></div>
+      <button class="btn btn-main" onclick="next()">다음</button>`;
+  } else if(q.type==='multi'){
+    h += `<div class="chips">` + q.opts.filter(o=>!(o.f && A.sex!=='f') && !(o.m && A.sex==='f')).map(o=>
+      `<button class="chip ${A.fam.includes(o.v)?'sel':''}" onclick="tog('${o.v}',${!!o.x})">${o.t}</button>`).join('') + `</div>
+      <button class="btn btn-main" onclick="if(!A.fam.length){toast('하나 이상 골라주세요');return}finish()">결과 보기 ✨</button>`;
+  } else {
+    h += `<div class="opts ${q.type==='two'?'two':''}">` + q.opts.map(o=>
+      `<button class="opt ${A[q.id]===o.v?'sel':''}" onclick='pick("${q.id}",${JSON.stringify(o.v)},this)'><span class="e">${o.e}</span><span>${o.t}${o.d?`<span class="d">${o.d}</span>`:''}</span></button>`).join('') + `</div>`;
+  }
+  $('#qwrap').innerHTML = h;
+}
+function pick(id,v,el){A[id]=v;el.classList.add('sel');setTimeout(next,220)}
+function nud(k,d){A[k]+=d;A.h=Math.min(200,Math.max(140,A.h));A.w=Math.min(140,Math.max(35,A.w));renderQ()}
+function upBody(){$('#hv').textContent=A.h+'cm';$('#wv').textContent=A.w+'kg';const av=$('#av');av.style.transform='scale('+(0.9+(A.h-140)/300)+')'}
+function tog(v,ex){
+  if(ex){A.fam = A.fam.includes(v)?[]:[v]}
+  else{A.fam = A.fam.filter(x=>x!=='none'&&x!=='dk'); A.fam = A.fam.includes(v)?A.fam.filter(x=>x!==v):[...A.fam,v]}
+  renderQ();
+}
+
+/* ---------- 계산 ---------- */
+const clamp = x => Math.max(10,Math.min(100,x));
+const lv = s => Math.max(1,Math.round(s/10));
+let R = null;
+
+function calc(){
+  const bmi = A.w/((A.h/100)**2);
+  let vessel=100, lung=100, gut=100, rest=100, power=100;
+  // 혈관력
+  vessel -= [0,10,25,35][A.smoke];
+  if(bmi>=25) vessel-=10; if(bmi>=27) vessel-=5; if(bmi>=30) vessel-=10;
+  vessel -= [20,10,0][A.ex];
+  if(A.sleep===0) vessel-=15; if(A.sleep===3) vessel-=5;
+  if(A.drink===2) vessel-=10;
+  // 호흡력
+  lung -= [0,20,45,65][A.smoke]; if(A.ex===0) lung-=10;
+  // 위장력
+  gut -= [0,5,20][A.salt]; gut -= [0,10,35][A.drink]; gut -= [0,5,20,20][A.smoke];
+  // 회복력
+  rest -= [40,15,0,15][A.sleep]; rest -= [15,5,0][A.ex]; if(A.drink===2) rest-=15;
+  // 체력
+  if(bmi<18.5) power-=20; else if(bmi>=30) power-=35; else if(bmi>=27) power-=25; else if(bmi>=25) power-=15; else if(bmi>=23) power-=5;
+  power -= [30,15,0][A.ex];
+
+  const stats = [
+    {k:'vessel',n:'❤️ 혈관력',s:clamp(vessel),c:'#FF6B4A'},
+    {k:'lung',n:'🫁 호흡력',s:clamp(lung),c:'#3D7BE0'},
+    {k:'gut',n:'🍲 위장력',s:clamp(gut),c:'#F2A900'},
+    {k:'rest',n:'😴 회복력',s:clamp(rest),c:'#8B5CF6'},
+    {k:'power',n:'💪 체력',s:clamp(power),c:'#22A06B'}
+  ];
+
+  // 별명
+  let nick;
+  if(A.smoke>=2) nick={i:0,e:'🔥',t:'열정 과열형',d:'에너지가 넘치지만, 엔진을 식혀줄 쉼표가 필요한 타입'};
+  else if(A.drink===2) nick={i:1,e:'🍻',t:'분위기 메이커형',d:'자리를 빛내는 인싸, 간과 위에게도 휴가가 필요한 타입'};
+  else if(A.sleep===0) nick={i:2,e:'🌙',t:'올빼미 야근러형',d:'밤에도 열일하는 성실파, 회복 시간이 아쉬운 타입'};
+  else if(A.ex===0) nick={i:3,e:'🛋️',t:'소파 지킴이형',d:'평화를 사랑하는 집순·집돌, 움직임 한 스푼이 필요한 타입'};
+  else if(A.salt===2) nick={i:4,e:'🍜',t:'국물 사랑 미식가형',d:'맛을 아는 미식가, 소금만 살짝 줄이면 완벽한 타입'};
+  else nick={i:5,e:'🏆',t:'자기관리 만렙형',d:'생활습관 스탯이 고르게 높은 모범 캐릭터'};
+
+  // 강점
+  const sorted=[...stats].sort((a,b)=>b.s-a.s);
+  let good = sorted.filter(s=>lv(s.s)>=8).slice(0,2);
+  if(!good.length) good=[sorted[0]];
+
+  // 레벨업 포인트
+  const up=[];
+  if(A.smoke>=2) up.push({t:'🚭 금연 퀘스트',x:'흡연은 폐뿐 아니라 위·간 등 여러 장기와 혈관에 영향을 줘요. 끊은 기간이 길어질수록 위험은 낮아지는 쪽으로 움직여요.',
+    ev:`비흡연자와 비교해 폐암 발생 위험이 <b>현재 흡연자 3.25배</b>, <b>30년·20갑년 이상 흡연자 5.73배</b>였어요. 장기 흡연자는 위암 2.4배, 간암 2.3배, 대장암 1.5배였어요.`,h:'폐암 위험 최대 5.73배',r:'smoke'});
+  if(A.drink===2) up.push({t:'🍻 절주 퀘스트',x:'술은 양이 많을수록 소화기 암 위험이 함께 커져요.',
+    ev:`하루 알코올 30g 이상(소주 약 4~5잔) 마시는 사람은 안 마시는 사람보다 <b>식도암 3.13배</b>, 위암 1.24배, 대장암 1.32배 위험이 높았어요.`,h:'식도암 위험 3.13배',r:'drink'});
+  if(A.ex===0) up.push({t:'🏃 움직임 퀘스트',x:'숨이 찰 정도의 활동을 일주일에 2~3번만 꾸준히 해도 차이가 생겨요.',
+    ev:`10년 동안 주 2~3일 꾸준히 운동한 그룹은 거의 운동하지 않은 그룹보다 <b>심뇌혈관질환 위험이 약 40% 낮았어요</b>(오즈비 0.60).`,h:'꾸준히 움직이면 심뇌혈관질환 위험 약 40%↓',r:'ex'});
+  if(A.ex===1) up.push({t:'🏃 한 번만 더 퀘스트',x:'일주일에 1번에서 2~3번으로 늘리는 게 핵심이에요.',
+    ev:`주 2~3일 운동 그룹은 비활동 그룹보다 심뇌혈관질환 위험이 <b>약 40% 낮았지만</b>, 주 1일 그룹은 뚜렷한 차이가 없었어요.`,h:'주 2~3회부터 위험 약 40%↓',r:'ex'});
+  if(A.sleep===0) up.push({t:'😴 수면 퀘스트',x:'잠은 몸이 회복하는 시간이에요. 한국인 연구에서는 7~8시간일 때 사망 위험이 가장 낮았어요.',
+    ev:`하루 5시간 이하로 자는 사람은 7시간 자는 사람보다 <b>심혈관질환으로 인한 사망 위험이 1.40배</b>였어요.`,h:'심혈관질환 사망 위험 1.40배',r:'sleep'});
+  const bmi_=A.w/((A.h/100)**2);
+  if(bmi_>=25) up.push({t:'💪 체중 관리 퀘스트',x:'체중은 혈압·혈당과 가장 밀접하게 연결된 스탯이에요.',
+    ev:`BMI가 높아질수록 고혈압·당뇨병 발생 위험이 함께 높아졌고, BMI 34 구간에서는 <b>고혈압 2.06배, 당뇨병 2.88배</b>까지 높아졌어요.`,h:'당뇨병 위험 최대 2.88배',r:'bmi'});
+  if(A.salt===2) up.push({t:'🧂 싱겁게 퀘스트',x:'국물을 반만 남겨도 시작이에요.',
+    ev:`짠 음식을 좋아하는 사람은 그렇지 않은 사람보다 <b>위암 발생 위험이 약 10%(1.10배)</b> 높았어요. 연구진은 약한 연관성으로 평가했어요.`,h:'위암 위험 1.10배',r:'salt'});
+  if(A.drink===1 && up.length<3) up.push({t:'🍺 가볍게도 체크',x:'적당한 음주도 완전히 안전한 건 아니에요.',
+    ev:`하루 알코올 30g 미만으로 마시는 사람도 안 마시는 사람보다 <b>식도암 위험이 1.52배</b>였어요.`,h:'식도암 위험 1.52배',r:'drink'});
+
+  // 대비 포인트 (바꿀 수 없는 것)
+  const f=A.fam, prep=[];
+  const famCancer = ['gc','crc','lung','liver','panc','thy','breast','pros'].filter(x=>f.includes(x));
+  const famCV = ['stroke','heart','htn'].filter(x=>f.includes(x));
+  prep.push({t:'📈 오래 살수록 만나기 쉬운 암',x:`지금의 암 발생률이 유지된다면, 기대수명까지 살 때 암을 경험할 확률이 <b>${A.sex==='f'?'여성 38.2%':'남성 44.6%'}</b>로 추정돼요. ${A.sex==='f'?'약 5명 중 2명':'약 2명 중 1명'}꼴이에요.`,r:'ncr'});
+  prep.push(topCancers());
+  if(f.includes('gc')) prep.push({t:'🎗️ 위암 가족력',x:`직계가족 중 위암 환자가 있는 경우 위암 발생 위험이 <b>2.85배</b>로 조사됐어요(국내 환자-대조군 연구).`,r:'famGC'});
+  const other = famCancer.filter(x=>x!=='gc');
+  if(other.length){const nm={crc:'대장암',lung:'폐암',liver:'간암',panc:'췌장암',thy:'갑상선암',breast:'유방암',pros:'전립선암'};
+    prep.push({t:'🎗️ '+other.map(x=>nm[x]).join('·')+' 가족력',x:'직계가족의 암 병력은 해당 암의 알려진 위험요인이에요. 가족력이 있다면 검진 시기와 주기를 의료진과 상의해 보세요.',r:null});}
+  if(famCV.length || A.age>=40){
+    const parts=[]; if(famCV.length) parts.push('가족력'); if(A.age>=40) parts.push('나이');
+    prep.push({t:'🧠 뇌·심장 위험인자',x:`질병관리청은 성별·나이·가족력을 <b>바꿀 수 없는 위험인자</b>로 보고, 중년 이후 주요 위험인자가 3가지 이상이면 심뇌혈관질환 고위험군으로 안내해요. 지금 해당되는 항목: ${parts.join(', ')}.`,r:'kdca'});
+  }
+
+  // 점검 영역
+  const area={
+    cancer: A.smoke>=2 || A.drink===2 || A.salt===2 || famCancer.length>0,
+    cardio: A.smoke>=2 || A.ex===0 || A.sleep===0 || bmi_>=25 || famCV.length>0 || A.age>=50,
+    meta:   bmi_>=25 || A.ex===0 || f.includes('htn')
+  };
+  if(!area.cancer && !area.cardio && !area.meta) area.cancer=true; // 평생 암 확률 기준 기본 점검
+  const traits=['alarm','lunch','stairs','stress'].map(id=>{const q=Q.find(q=>q.id===id);const o=q.opts.find(o=>o.v===A[id]);return o?o.tr:null}).filter(Boolean);
+  return {stats,nick,good,up:up.slice(0,3),prep,area,traits};
+}
+
+const COV = {
+  cancer:{t:'🎗️ 암 보장 점검',l:['암 진단비가 있는지, 금액이 지금 물가 기준으로 충분한지','진단 이후 치료비(수술·항암·방사선 등)까지 대비되는지','갑상선암 등 자주 생기는 암이 상품에 따라 일반암보다 적게 지급되는 유사암·소액암으로 분류되는지']},
+  cardio:{t:'🧠 뇌·심장 보장 점검',l:['뇌: 뇌출혈만인지, 뇌졸중인지, 뇌혈관질환 전체인지 보장 범위 확인','심장: 급성심근경색만인지, 허혈성심장질환까지인지 확인']},
+  meta:{t:'🩸 대사질환 대비 점검',l:['고혈압·당뇨 진단 이후에는 보험 가입 조건이 달라질 수 있어요','건강할 때 미리 보장을 점검해 두는 것이 유리해요']}
+};
+
+function finish(){
+  $('#bar').style.width='100%';
+  show('s-load');
+  const msgs=['스탯 계산 중...','국내 연구 데이터 대조 중...','캐릭터 생성 중...'];
+  let i=0; const t=setInterval(()=>{i++; if(i<msgs.length) $('#loadtxt').textContent=msgs[i]},550);
+  setTimeout(()=>{clearInterval(t);R=calc();renderResult();show('s-result');
+    setTimeout(()=>document.querySelectorAll('.st .tr i').forEach(e=>e.style.width=e.dataset.w),80)},1700);
+}
+
+function renderResult(){
+  $('#r-emoji').textContent=R.nick.e;
+  $('#r-nick').textContent=R.nick.t;
+  $('#r-desc').textContent=R.nick.d;
+  $('#r-traits').innerHTML=R.traits.map(t=>`<span>${t}</span>`).join('');
+  $('#r-stats').innerHTML=R.stats.map(s=>`<div class="st"><span class="nm">${s.n}</span><span class="tr"><i data-w="${s.s}%" style="background:${s.c}"></i></span><span class="lv" style="color:${s.c}">Lv.${lv(s.s)}</span></div>`).join('');
+  $('#r-good').innerHTML=R.good.map(s=>`<div class="good">✅ <b>${s.n}</b> Lv.${lv(s.s)} — ${goodMsg(s.k)}</div>`).join('')
+    + (A.smoke===1?`<div class="good">👏 <b>금연에 성공</b>하셨네요. 가장 어려운 퀘스트를 깨셨어요.</div>`:'');
+  const used=new Set();
+  $('#r-up').innerHTML = R.up.length ? R.up.map(u=>{used.add(u.r);return `<div class="item"><div class="it">${u.t}</div><div class="ix">${u.x}</div><span class="hl">📊 ${u.h}</span><details class="evd"><summary>근거 자세히 보기 ▾</summary><div class="ev">${u.ev}<span class="src">출처: ${REF[u.r]}</span></div></details></div>`}).join('')
+    : `<div class="good">🎉 눈에 띄는 레벨업 포인트가 없어요. 지금 습관을 그대로 유지하는 게 최고의 전략이에요.</div>`;
+  let ph = R.prep.map(p=>{if(p.r)used.add(p.r);return `<div class="item"><div class="it">${p.t}</div><div class="ix">${p.x}</div>${p.r?`<details class="evd"><summary>출처 보기 ▾</summary><div class="ev" style="padding:8px 12px"><span class="src" style="margin:0">${REF[p.r]}</span></div></details>`:''}</div>`}).join('');
+  ph += Object.keys(R.area).filter(k=>R.area[k]).map(k=>`<div class="cov"><div class="ct">${COV[k].t}</div><ul>${COV[k].l.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('');
+  $('#r-prep').innerHTML=ph;
+  $('#r-refs').innerHTML=[...used].map(k=>`<li>${REF[k]}</li>`).join('');
+  buildSC();
+}
+const SCQ = {
+  brain:{q:'🧠 내 보험의 뇌 보장이 <b>뇌출혈만</b>인지, <b>뇌혈관질환 전체</b>인지 알고 있다',s:'뇌 보장 범위(뇌출혈만인지, 뇌혈관질환 전체인지)'},
+  heart:{q:'❤️ 심장 보장이 <b>급성심근경색만</b>인지, <b>허혈성심장질환</b>까지인지 알고 있다',s:'심장 보장 범위(급성심근경색만인지, 허혈성심장질환까지인지)'},
+  amt:{q:'🎗️ 암에 걸리면 내 보험에서 <b>진단비가 얼마</b> 나오는지 알고 있다',s:'암 진단비 금액'},
+  thy:{q:'🎗️ 갑상선암이 <b>일반암 금액</b>으로 나오는지, <b>유사암</b>으로 적게 나오는지 알고 있다',s:'갑상선암 지급 기준(일반암인지 유사암인지)'},
+  term:{q:'⏳ 내 보장이 <b>몇 살까지</b> 유지되는지(만기) 알고 있다',s:'보장 만기(몇 살까지인지)'}
+};
+let SC=[], SA={};
+function buildSC(){
+  const pick=[]; const ar=R.area;
+  if(ar.cardio) pick.push('brain');
+  if(ar.cancer||true) pick.push((A.sex==='f'||A.age<40)?'thy':'amt');
+  if(ar.cardio && pick.length<3) pick.push('heart');
+  ['term','amt','thy','heart','brain'].forEach(k=>{if(pick.length<3 && !pick.includes(k)) pick.push(k)});
+  SC=pick.slice(0,3); SA={};
+  $('#r-sc').innerHTML=SC.map(k=>`<div class="sc" id="sc-${k}"><div class="q">${SCQ[k].q}</div><div class="ab"><button onclick="ans('${k}',1,this)">👌 알아요</button><button onclick="ans('${k}',0,this)">🤔 몰라요</button></div></div>`).join('');
+  $('#sc-res').classList.remove('on');
+}
+function ans(k,v,el){
+  SA[k]=v; const box=$('#sc-'+k); box.classList.add('done');
+  box.querySelectorAll('button').forEach(b=>b.classList.remove('on')); el.classList.add('on');
+  if(Object.keys(SA).length===SC.length){
+    const unk=SC.filter(x=>SA[x]===0), r=$('#sc-res');
+    if(unk.length){
+      r.style.background='var(--coral-soft)';
+      r.innerHTML=`<div style="font-size:14px;color:var(--sub)">모르는 항목</div><div class="n">${unk.length}개</div><p>괜찮아요, <b>대부분 모르세요.</b><br>다만 <b>막상 필요할 때</b> 알게 되면 늦을 수 있는 내용이에요.<br>보험증권만 있으면 <b>지금 바로</b> 확인할 수 있어요.</p><button class="btn btn-main" style="margin-top:14px" onclick="document.getElementById('share').scrollIntoView({behavior:'smooth'})">👇 내 보험으로 확인받기</button>`;
+    } else {
+      r.style.background='var(--mint-soft)';
+      r.innerHTML=`<div class="n" style="color:var(--mint)">🏆 3/3</div><p>보험까지 잘 챙기고 계시네요!<br>다만 <b>금액이 지금 물가 기준으로 충분한지</b>는 한 번 비교해 보면 좋아요.</p><button class="btn btn-sub" style="margin-top:14px" onclick="document.getElementById('share').scrollIntoView({behavior:'smooth'})">그래도 한번 확인받기</button>`;
+    }
+    r.classList.add('on'); setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'center'}),150);
+  }
+}
+function unknownList(){const u=SC.filter(x=>SA[x]===0);return (u.length?u:(Object.keys(SA).length?[]:SC)).map(k=>SCQ[k].s)}
+function topCancers(){
+  const f=A.sex==='f', old=A.age>=60;
+  let list, who;
+  if(old){ list = f?['대장암','폐암','유방암','위암','췌장암']:['전립선암','폐암','위암','대장암','간암']; who=(f?'65세 이상 여성':'65세 이상 남성'); }
+  else { list = f?['유방암 21.6%','갑상선암 19.0%','대장암 9.8%','폐암 8.1%','위암 7.0%','췌장암 3.5%']:['전립선암 15.0%','폐암 14.5%','위암 12.8%','대장암 12.7%','간암 7.2%','갑상선암 6.2%']; who=(f?'여성 전체':'남성 전체'); }
+  let ageLine='';
+  if(A.age===20||A.age===30) ageLine='20·30대에서 가장 많이 발생한 암은 <b>갑상선암</b>이에요. ';
+  else if(A.age===50) ageLine='50대에서 가장 많이 발생한 암은 <b>유방암</b>이에요(남녀 전체 기준). ';
+  else if(A.age>=60) ageLine='60대 이상에서 가장 많이 발생한 암은 <b>폐암</b>이에요(남녀 전체 기준). ';
+  return {t:'📋 '+(f?'여성':'남성')+'에게 많이 생기는 암 순위',x:`${ageLine}2023년 새로 진단된 암을 ${who} 기준으로 보면 <b>${list.join(' · ')}</b> 순이었어요.`,r:'ncr'};
+}
+function goodMsg(k){return {vessel:'혈관을 지키는 습관이 잘 잡혀 있어요',lung:'숨 쉬는 힘을 잘 지키고 있어요',gut:'소화기를 아끼는 식습관이에요',rest:'충분히 쉬고 회복하고 있어요',power:'체중과 활동량 밸런스가 좋아요'}[k]}
+
+/* ---------- 공유 ---------- */
+function areaNames(){return Object.keys(R.area).filter(k=>R.area[k]).map(k=>({cancer:'암',cardio:'뇌·심장',meta:'대사질환'}[k]))}
+function copyText(){
+  const u=unknownList();
+  const t=`[내 몸 캐릭터 스탯 결과]\n${R.nick.e} ${R.nick.t}\n${R.stats.map(s=>`${s.n} Lv.${lv(s.s)}`).join(' / ')}\n점검하면 좋은 보장: ${areaNames().join(', ')}\n\n`+(u.length?`제 보험으로 확인받고 싶어요 🙋\n${u.map((x,i)=>`${i+1}. ${x}`).join('\n')}`:`제 보험 금액이 지금 기준으로 충분한지 확인받고 싶어요 🙋`)+`\n\n(키·몸무게·가족력 등 답변 내용은 포함되지 않았어요)`;
+  const done=()=>toast('복사됐어요! 카톡에 붙여넣어 주세요');
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done))}else fallbackCopy(t,done);
+}
+function fallbackCopy(t,done){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('복사가 안 되면 화면을 캡처해 주세요')}ta.remove()}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2000)}
+function closeModal(){$('#modal').classList.remove('on')}
+
+async function makeImage(){
+  try{await Promise.all(['700 38px "Noto Sans KR"','900 38px "Noto Sans KR"','500 34px "Noto Sans KR"','66px "Gowun Dodum"'].map(f=>document.fonts.load(f,'가Lv.1')));await document.fonts.ready}catch(e){}
+  const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.fillStyle='#FFF7EC';x.fillRect(0,0,W,H);
+  // card
+  rr(x,60,60,W-120,H-120,48,'#FFFFFF');
+  x.textAlign='center';x.fillStyle='#6E6878';x.font='500 34px "Noto Sans KR"';x.fillText('내 몸 캐릭터 스탯 테스트',W/2,150);
+  x.font='150px serif';x.fillText(R.nick.e,W/2,330);
+  x.fillStyle='#2A2733';x.font='66px "Gowun Dodum","Noto Sans KR"';x.fillText(R.nick.t,W/2,440);
+  x.fillStyle='#6E6878';x.font='32px "Noto Sans KR"';wrap(x,R.nick.d,W/2,495,820,44);
+  x.fillStyle='#2A2733';x.font='500 26px "Noto Sans KR"';x.fillText(R.traits.join('   '),W/2,560);
+  // stats
+  let y=615; x.textAlign='left';
+  R.stats.forEach(s=>{
+    x.fillStyle='#2A2733';x.font='700 38px "Noto Sans KR"';x.fillText(s.n,140,y+14);
+    rr(x,380,y-16,460,36,18,'#F3EDE3'); rr(x,380,y-16,Math.max(36,460*s.s/100),36,18,s.c);
+    x.fillStyle=s.c;x.font='900 38px "Noto Sans KR"';x.textAlign='right';x.fillText('Lv.'+lv(s.s),940,y+14);x.textAlign='left';
+    y+=60;
+  });
+  // areas
+  y+=6; const U=unknownList();
+  if(U.length){
+    const bh=78+U.length*50; rr(x,120,y,W-240,bh,28,'#FFE6DF');
+    x.textAlign='center';x.fillStyle='#C2410C';x.font='900 32px "Noto Sans KR"';x.fillText('🙋 내 보험으로 확인이 필요한 항목',W/2,y+54);
+    x.fillStyle='#2A2733';x.font='500 30px "Noto Sans KR"';
+    U.forEach((t,i)=>{let s=t.replace(/\(.*\)/,'').trim();x.fillText('· '+s,W/2,y+104+i*50)});
+  } else {
+    rr(x,120,y,W-240,150,28,'#E3EDFD');
+    x.textAlign='center';x.fillStyle='#3D7BE0';x.font='900 34px "Noto Sans KR"';x.fillText('점검하면 좋은 보장',W/2,y+58);
+    x.fillStyle='#2A2733';x.font='700 44px "Noto Sans KR"';x.fillText(areaNames().join('  ·  '),W/2,y+118);
+  }
+  x.fillStyle='#FF6B4A';x.font='36px "Gowun Dodum","Noto Sans KR"';x.fillText('바꿀 수 있는 건 습관으로, 바꿀 수 없는 건 보장으로',W/2,H-125);
+    x.font='22px "Noto Sans KR"';x.fillText('참고용 셀프체크 · 답변 내용은 담기지 않았어요',W/2,H-82);
+  $('#cardimg').src=c.toDataURL('image/png');$('#modal').classList.add('on');
+}
+function rr(x,a,b,w,h,r,f){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();x.fillStyle=f;x.fill()}
+function wrap(x,t,cx,y,mw,lh){let line='';for(const ch of t){const test=line+ch;if(x.measureText(test).width>mw){x.fillText(line,cx,y);line=ch;y+=lh}else line=test}x.fillText(line,cx,y)}
+</script>
+</body>
+</html>
